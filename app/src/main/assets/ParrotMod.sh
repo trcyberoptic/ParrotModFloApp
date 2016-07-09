@@ -19,6 +19,8 @@ setprop dalvik.vm.heaptargetutilization 0.75
 setprop dalvik.vm.heapminfree 512k
 setprop dalvik.vm.heapmaxfree 8m
 
+echo "interactive" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor # use interactive instead of ondemand for higher average cpu speeds. 
+
 echo 48 > /sys/module/lowmemorykiller/parameters/cost # default 32
 
 echo 1 > /proc/sys/vm/highmem_is_dirtyable # allow LMK to free more ram
@@ -48,8 +50,8 @@ cd "$olddir"
 
 for m in /data /realdata /cache /system ; do
 	test ! -e $m && continue
-	mount | grep "$m" | grep -q ext4 && mount -t ext4 -o remount,noauto_da_alloc,journal_async_commit,journal_ioprio=7,barrier=0,dioread_nolock "$m" "$m"
-	mount | grep "$m" | grep -q f2fs && mount -t f2fs -o remount,nobarrier,flush_merge,inline_xattr,inline_data,inline_dentry "$m" "$m"
+	mount | grep "$m" | grep -q ext4 && mount -t ext4 -o remount,discard,noauto_da_alloc,journal_async_commit,journal_ioprio=7,barrier=0,dioread_nolock "$m" "$m"
+	mount | grep "$m" | grep -q f2fs && mount -t f2fs -o remount,discard,nobarrier,flush_merge,inline_xattr,inline_data,inline_dentry "$m" "$m"
 done
 
 for f in /sys/fs/ext4/*; do
@@ -72,7 +74,7 @@ for f in /sys/block/loop*; do # loopback, like multirom USB boot
 	echo 0 > "${f}/queue/rotational"
 done
 
-echo 60 > /proc/sys/vm/swappiness # for some reason, 0 is default on flo, which messes up zram
+echo 10 > /proc/sys/vm/swappiness # for some reason, 0 is default on flo, which messes up zram # changed from 60 to 10 to reduce swapping
 echo 0 > /proc/sys/vm/page-cluster # zram is not a disk with a sector size, can swap 1 page at once
 
 if test -e /sys/block/zram0; then
