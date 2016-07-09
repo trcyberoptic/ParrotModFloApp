@@ -46,13 +46,10 @@ public class SystemPropertiesProxy {
     /**
      * Get the value for the given key in the Android system properties
      *
-     * @param key
-     *          the key to lookup
-     * @param def
-     *          a default value to return
+     * @param key the key to lookup
+     * @param def a default value to return
      * @return an empty string if the key isn't found
-     * @throws IllegalArgumentException
-     *           if the key exceeds 32 characters
+     * @throws IllegalArgumentException if the key exceeds 32 characters
      */
     @SuppressWarnings("unused")
     public String get(String key, String def)
@@ -79,20 +76,17 @@ public class SystemPropertiesProxy {
     /**
      * Get the value for the given key in the Android system properties, returned
      * as a boolean.
-     *
+     * <p/>
      * Values 'n', 'no', '0', 'false' or 'off' are considered false. Values 'y',
      * 'yes', '1', 'true' or 'on' are considered true. (case insensitive). If the
      * key does not exist, or has any other value, then the default result is
      * returned.
      *
-     * @param key
-     *          the key to lookup
-     * @param def
-     *          a default value to return
+     * @param key the key to lookup
+     * @param def a default value to return
      * @return the key parsed as a boolean, or def if the key isn't found or is
-     *         not able to be parsed as a boolean.
-     * @throws IllegalArgumentException
-     *           if the key exceeds 32 characters
+     * not able to be parsed as a boolean.
+     * @throws IllegalArgumentException if the key exceeds 32 characters
      */
     public Boolean getBoolean(String key, boolean def)
             throws IllegalArgumentException {

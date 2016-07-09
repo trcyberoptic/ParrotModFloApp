@@ -8,18 +8,11 @@ echo "-1000" > /proc/$mypid/oom_score_adj
 olddir="$(pwd)"
 emicb="$(dirname "$0")/emi_config.bin"
 
-# ram tuning
-
-# these are from Intel's recommendation for 2GB/xhdpi tablet devices
-# https://01.org/android-ia/user-guides/android-memory-tuning-android-5.0-and-5.1
-setprop dalvik.vm.heapstartsize 16m
-setprop dalvik.vm.heapgrowthlimit 200m
-setprop dalvik.vm.heapsize 348m
-setprop dalvik.vm.heaptargetutilization 0.75
-setprop dalvik.vm.heapminfree 512k
-setprop dalvik.vm.heapmaxfree 8m
+# cpu tuning
 
 echo "interactive" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor # use interactive instead of ondemand for higher average cpu speeds. 
+
+# ram tuning
 
 echo 48 > /sys/module/lowmemorykiller/parameters/cost # default 32
 

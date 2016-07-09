@@ -2,6 +2,7 @@ package com.parrotgeek.parrotmodfloapp;
 
 import android.app.AlertDialog;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,15 +20,14 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
-import android.app.PendingIntent;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 public class MyService extends Service {
-    public static boolean running = false;
     private static final String TAG = "ParrotMod";
+    public static boolean running = false;
     public static MainActivity mainActivity;
 
     private PowerManager.WakeLock wl;
@@ -35,80 +35,8 @@ public class MyService extends Service {
     private SuShell shell;
 
     private String emicb;
-
-    private class GyroRunnable implements Runnable {
-        private SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        Sensor accel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        Sensor gyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE_UNCALIBRATED);
-        private SensorEventListener mSensorEventListener;
-        long changed = System.currentTimeMillis();
-        private Runnable mRunnable1 = new Runnable() {
-            @Override
-            public void run() {
-                if(changed < (System.currentTimeMillis() - 300)) {
-                    // if didn't get sensor in 300ms restart it
-                    Log.d(TAG,"---- RESET SENSORS ----");
-                    unregister();
-                    register();
-                }
-            }
-        };
-        Handler handler = new Handler();
-        @Override
-        public void run() {
-            mSensorEventListener = new SensorEventListener() {
-                @Override
-                public void onSensorChanged(SensorEvent event) {
-                    changed = System.currentTimeMillis();
-                    handler.postDelayed(mRunnable1, 300); // ms
-                }
-
-                @Override
-                public void onAccuracyChanged(Sensor sensor, int accuracy) {
-                    // don't need it
-                }
-            };
-            IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-            filter.addAction(Intent.ACTION_SCREEN_OFF);
-            filter.addAction(Intent.ACTION_POWER_CONNECTED);
-            filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
-            filter.addAction("android.intent.action.HDMI_PLUGGED");
-            registerReceiver(mReceiver, filter);
-            register();
-
-        }
-        private void unregister() {
-            changed = 0;
-            handler.removeCallbacks(mRunnable1);
-            mSensorManager.unregisterListener(mSensorEventListener);
-        }
-
-        private void register() {
-            changed = System.currentTimeMillis();
-            mSensorManager.registerListener(mSensorEventListener, accel, SensorManager.SENSOR_DELAY_NORMAL); // ~240ms
-            mSensorManager.registerListener(mSensorEventListener, gyro, 10000000); // 10 sec, basically to keep it running
-        }
-
-
-        public BroadcastReceiver mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-                    wl.acquire(4000); // 4 sec
-                    unregister();
-                } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-                    if(wl.isHeld()) wl.release();
-                    register();
-                } else if(intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)
-                        ||intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)
-                        ||intent.getAction().equals("android.intent.action.HDMI_PLUGGED")) {
-                    wl.acquire(500);
-                    shell.run("cat '"+emicb+"' > /dev/elan-iap");
-                }
-            }
-        };
-    }
     private GyroRunnable mGyroRunnable;
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -155,7 +83,7 @@ public class MyService extends Service {
         copyFile("ParrotMod.sh");
         copyFile("emi_config.bin");
         String script = getApplicationContext().getApplicationInfo().dataDir + "/ParrotMod.sh";
-        boolean su = SystemPropertiesProxy.getInstance().getBoolean("supolicy.loaded",false);
+        boolean su = SystemPropertiesProxy.getInstance().getBoolean("supolicy.loaded", false);
         if (!su) {
             setRunning(false);
             AlertDialog alertDialog = new AlertDialog.Builder(getApplicationContext()).create();
@@ -178,7 +106,7 @@ public class MyService extends Service {
                 String str;
                 while (true) {
                     str = execCmd(cmd);
-                    if(str == null) {
+                    if (str == null) {
                         Log.e(TAG, "STOP LOOP due to exec error");
                         return;
                     }
@@ -199,7 +127,7 @@ public class MyService extends Service {
         Intent notificationIntent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         notificationIntent.setData(Uri.parse("package:" + getPackageName()));
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this,0,notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification.Builder(getApplicationContext())
                 .setContentTitle("ParrotMod is running")
                 .setContentText("Tap here and go to Notifications to hide this.")
@@ -224,7 +152,80 @@ public class MyService extends Service {
     }
 
     private void setRunning(boolean running) {
-        if(mainActivity != null) mainActivity.setRunning(running);
+        if (mainActivity != null) mainActivity.setRunning(running);
         MyService.running = running;
+    }
+
+    private class GyroRunnable implements Runnable {
+        long changed = System.currentTimeMillis();
+        Handler handler = new Handler();
+        private SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        Sensor accel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor gyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE_UNCALIBRATED);
+        private SensorEventListener mSensorEventListener;
+        private Runnable mRunnable1 = new Runnable() {
+            @Override
+            public void run() {
+                if (changed < (System.currentTimeMillis() - 300)) {
+                    // if didn't get sensor in 300ms restart it
+                    Log.d(TAG, "---- RESET SENSORS ----");
+                    unregister();
+                    register();
+                }
+            }
+        };
+        public BroadcastReceiver mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                    wl.acquire(4000); // 4 sec
+                    unregister();
+                } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                    if (wl.isHeld()) wl.release();
+                    register();
+                } else if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)
+                        || intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)
+                        || intent.getAction().equals("android.intent.action.HDMI_PLUGGED")) {
+                    wl.acquire(500);
+                    shell.run("cat '" + emicb + "' > /dev/elan-iap");
+                }
+            }
+        };
+
+        @Override
+        public void run() {
+            mSensorEventListener = new SensorEventListener() {
+                @Override
+                public void onSensorChanged(SensorEvent event) {
+                    changed = System.currentTimeMillis();
+                    handler.postDelayed(mRunnable1, 300); // ms
+                }
+
+                @Override
+                public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                    // don't need it
+                }
+            };
+            IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+            filter.addAction(Intent.ACTION_SCREEN_OFF);
+            filter.addAction(Intent.ACTION_POWER_CONNECTED);
+            filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+            filter.addAction("android.intent.action.HDMI_PLUGGED");
+            registerReceiver(mReceiver, filter);
+            register();
+
+        }
+
+        private void unregister() {
+            changed = 0;
+            handler.removeCallbacks(mRunnable1);
+            mSensorManager.unregisterListener(mSensorEventListener);
+        }
+
+        private void register() {
+            changed = System.currentTimeMillis();
+            mSensorManager.registerListener(mSensorEventListener, accel, SensorManager.SENSOR_DELAY_NORMAL); // ~240ms
+            mSensorManager.registerListener(mSensorEventListener, gyro, 10000000); // 10 sec, basically to keep it running
+        }
     }
 }

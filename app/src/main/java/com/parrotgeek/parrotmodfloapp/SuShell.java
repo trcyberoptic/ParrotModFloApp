@@ -13,16 +13,16 @@ public class SuShell {
             proc = Runtime.getRuntime().exec("su");
             dos = new DataOutputStream(proc.getOutputStream());
         } catch (Exception e) {
-            Log.e("sushell",e.getLocalizedMessage());
+            Log.e("sushell", e.getLocalizedMessage());
         }
     }
 
     public void run(String cmd) {
         try {
-            dos.writeBytes(cmd+"\n");
+            dos.writeBytes(cmd + "\n");
             dos.flush();
         } catch (Exception e) {
-            Log.e("sushell",e.getLocalizedMessage());
+            Log.e("sushell", e.getLocalizedMessage());
         }
     }
 
@@ -33,7 +33,7 @@ public class SuShell {
             dos.close();
             proc.waitFor();
         } catch (Exception e) {
-            Log.e("sushell",e.getLocalizedMessage());
+            Log.e("sushell", e.getLocalizedMessage());
         }
     }
 }

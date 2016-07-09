@@ -10,63 +10,63 @@
     tools:context="com.parrotgeek.parrotmodfloapp.MainActivity">
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Click the button to enable ParrotMod, and enjoy your perfectly working touchscreen and auto rotate! (Root is required.)\n\nNote: you must turn off the screen for 2 seconds and turn it on again to fully calibrate the touchscreen for the first time."
-        android:id="@+id/textView" />
+        android:text="Click the button to enable ParrotMod, and enjoy your perfectly working touchscreen and auto rotate! (Root is required.)\n\nNote: you must turn off the screen for 2 seconds and turn it on again to fully calibrate the touchscreen for the first time." />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enable ParrotMod"
         android:id="@+id/button"
-        android:onClick="start"
-        android:layout_below="@+id/textView"
-        android:layout_centerHorizontal="true" />
-        
-    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hide App Icon"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:onClick="start"
+        android:text="Enable ParrotMod" />
+
+    <Button
         android:id="@+id/button4"
-        android:onClick="hideicon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/button"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp" />
+        android:layout_marginTop="40dp"
+        android:onClick="hideicon"
+        android:text="Hide App Icon" />
 
     <Button
+        android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ParrotGeek Software Site"
-        android:id="@+id/button2"
-        android:onClick="website"
         android:layout_below="@+id/button4"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp" />
+        android:layout_marginTop="40dp"
+        android:onClick="website"
+        android:text="ParrotGeek Software Site" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="XDA Thread"
         android:id="@+id/button3"
-        android:onClick="xda"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/button2"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:onClick="xda"
+        android:text="XDA Thread" />
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="ParrotMod is not running."
         android:id="@+id/textView2"
-        android:layout_below="@+id/button"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
+        android:layout_below="@+id/button"
+        android:layout_centerHorizontal="true"
+        android:text="ParrotMod is not running."
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
         android:id="@+id/version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:text="" />
 </RelativeLayout>
